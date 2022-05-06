@@ -25,6 +25,7 @@
   | orgid       | The Maximo Organization identifier for the storeroom location.                                                          |
   | siteid      | The Maximo Site identifier for the storeroom location.                                                                  |
   | location    | The name of the storeroom location where the printer is located.                                                        |
+  | remote      | Boolean value that indicates that the printer is remote to Maximo and is handled by the print agent.                    |
 
   Key points to note:
 
@@ -52,7 +53,8 @@
       "default": true,
       "orgid": "EAGLENA",
       "siteid": "BEDFORD",
-      "location": "CENTRAL"
+      "location": "CENTRAL",
+      "remote": false
     }
   ];
 

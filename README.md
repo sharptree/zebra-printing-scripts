@@ -17,18 +17,18 @@ Printers are defined as an array of values assigned to the `printers` variable i
 
 Each object in the array of printers contains the following attributes:
 
-| Attribute   | Description                                                                                                             |
-|:------------|:------------------------------------------------------------------------------------------------------------------------|
-| printer     | The unique identifier for the printer.                                                                                  |
-| description | A description of the printer, displayed to the user.                                                                    |
-| address     | The network host name or IP address of the printer.                                                                     |
-| port        | The port that the printer is listening on, a value between 0-65535, defaults to 9100, which is the Zebra default port.  |
-| media       | The media identifier, typically in HxW (2x1, 4x6 etc) format although non-standard identifiers may be used.             |
-| default     | Boolean value that indicates that the printer is the default for the storeroom location.                                |
-| orgid       | The Maximo Organization identifier for the storeroom location.                                                          |
-| siteid      | The Maximo Site identifier for the storeroom location.                                                                  |
-| location    | The name of the storeroom location where the printer is located.                                                        |
-
+| Attribute    | Description                                                                                                             |
+|:-------------|:------------------------------------------------------------------------------------------------------------------------|
+| printer      | The unique identifier for the printer.                                                                                  |
+| description  | A description of the printer, displayed to the user.                                                                    |
+| address      | The network host name or IP address of the printer.                                                                     |
+| port         | The port that the printer is listening on, a value between 0-65535, defaults to 9100, which is the Zebra default port.  |
+| media        | The media identifier, typically in HxW (2x1, 4x6 etc) format although non-standard identifiers may be used.             |
+| default      | Boolean value that indicates that the printer is the default for the storeroom location.                                |
+| orgid        | The Maximo Organization identifier for the storeroom location.                                                          |
+| siteid       | The Maximo Site identifier for the storeroom location.                                                                  |
+| location     | The name of the storeroom location where the printer is located.                                                        |
+| remote       | Boolean value that indicates that the printer is remote to Maximo and is handled by the print agent.                    |
 Key points to note:
 
 * The orgid, siteid and location identify the storeroom location that the printer resides in.  
@@ -47,7 +47,8 @@ Key points to note:
     "default": true,
     "orgid": "EAGLENA",
     "siteid": "BEDFORD",
-    "location": "CENTRAL"
+    "location": "CENTRAL",
+    "remote": false
   }
 ```
 
@@ -122,7 +123,7 @@ To print a label, make an HTTP request to the `stautoscript.zebralabel.printlabe
 | objectName      | The name of the Maximo object that will be used for bind variable replacement.                                                                                                                               |
 | recordId        | The Maximo unique record identifier for the provided object.                                                                                                                                                 |
 
-###Example
+### Example
 ```url
 https://maximo-host.acme.com/maximo/oslc/script/stautoscript.zebralabel.printlabel?labelName=MYLABEL&printerName=MYPRINTER&objectName=INVBALANCES&recordId=123456
 ```

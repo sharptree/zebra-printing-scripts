@@ -15,8 +15,6 @@ MXApplicationException = Java.type("psdi.util.MXApplicationException");
 MXException = Java.type("psdi.util.MXException");
 MXLoggerFactory = Java.type("psdi.util.logging.MXLoggerFactory");
 
-System = Java.type("java.lang.System");
-
 var logger = MXLoggerFactory.getLogger("maximo.script." + service.scriptName);;
 
 var timeout = 5000;
@@ -114,12 +112,13 @@ function main() {
             record = _getRecordForObjectAndId(mbo.getString("PARENT"), mbo.getLong("PARENTID"));
         } else {
             var location;
-            if (mbo.isBasedOn("INVBALANCES") || mbo.isBasedOn("INVENTORY")) {
+            if (mbo.isBasedOn("INVBALANCES") || mbo.isBasedOn("INVENTORY") || mbo.isBasedOn("ASSET") || mbo.isBasedOn("LOCATIONS")) {
                 location = mbo.getString("LOCATION");
             } else if (mbo.isBasedOn("MATRECTRANS")) {
                 location = mbo.getString("TOSTORELOC");
             } else {
                 logger.warn("The Mbo type " + mbo.getName() + " is not supported for label printing from the UI. Only STPRINTLABEL, INVBALANCES and MATRECTRANS are supported.");
+                return;
             }
 
             printer = _getDefaultPrinterByLocation(location, mbo.getString("SITEID"));
@@ -161,18 +160,22 @@ function printLabel(label, printer, record) {
     var clientSocket;
 
     try {
-        var sqlf = new SqlFormat(record, label.zpl);
-        sqlf.setIgnoreUnresolved(true);
-        var zpl = sqlf.resolveContent();
+        if (printer.remote) {
+            MXServer.getMXServer().reloadMaximoCache("ZEBRALABEL", printer.printer + "|" + label.label + "|" + record.getName() + "|" + record.getUniqueIDValue(), true);
+        } else {
+            var sqlf = new SqlFormat(record, label.zpl);
+            sqlf.setIgnoreUnresolved(true);
+            var zpl = sqlf.resolveContent();
 
-        zpl = zpl.replace(/(\r\n|\n|\r)/gm, "");
+            zpl = zpl.replace(/(\r\n|\n|\r)/gm, "");
 
-        clientSocket = new Socket();
-        clientSocket.connect(new InetSocketAddress(printer.address, printer.port), printer.timeout ? printer.timeout : timeout);
+            clientSocket = new Socket();
+            clientSocket.connect(new InetSocketAddress(printer.address, printer.port), printer.timeout ? printer.timeout : timeout);
 
-        var outToServer = new DataOutputStream(clientSocket.getOutputStream());
-        outToServer.writeBytes(zpl);
-        clientSocket.close();
+            var outToServer = new DataOutputStream(clientSocket.getOutputStream());
+            outToServer.writeBytes(zpl);
+            clientSocket.close();
+        }
     } finally {
         if (clientSocket) {
             clientSocket.close();
@@ -360,7 +363,7 @@ PrintError.prototype.constructor = PrintError;
 var scriptConfig = {
     "autoscript": "STAUTOSCRIPT.ZEBRALABEL.PRINTLABEL",
     "description": "Print a Barcode Label",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "active": true,
     "logLevel": "ERROR"
 };

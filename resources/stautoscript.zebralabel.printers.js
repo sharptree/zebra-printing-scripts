@@ -18,9 +18,14 @@ function main() {
 
     printers = _validateAndRemoveInvalidPrinters(printers);
 
-
     if (typeof request !== 'undefined' && request) {
         responseBody = JSON.stringify(printers);
+    } else if (typeof printerName !== 'undefined' && printerName) {
+        printers.forEach(function (printer) {
+            if (printer.printer == printerName) {
+                requestedPrinter = JSON.stringify(printer);
+            }
+        })
     }
 }
 
@@ -68,6 +73,7 @@ function _validateAndRemoveInvalidPrinters(printers) {
             printer.printer = printer.printer.toUpperCase();
             printer.location = printer.location.toUpperCase();
             printer.siteid = printer.siteid.toUpperCase();
+            printer.remote = typeof printer.remote == 'undefined' || !printer.remote ? false : true
             tmpPrinters.push(printer);
         } else {
             logger.error("The following printer configuration is missing either a printer, address port, storeroom, media or siteid attribute and will not be returned. \n\n" + JSON.stringify(printer, null, 4) + "\n");
@@ -162,9 +168,10 @@ function _convertMboToObject(mbo) {
     printer.port = mbo.getInt("PORT");
     printer.location = mbo.getString("LOCATION");
     printer.media = mbo.getString("MEDIA");
-    printer.default = mbo.getBoolean("DEFAULT");
+    printer.default = mbo.getBoolean("ISDEFAULT");
     printer.siteid = mbo.getString("SITEID");
     printer.orgid = mbo.getString("ORGID");
+    printer.remote = mbo.getBoolean("REMOTE");
 
     return printer;
 }
@@ -179,7 +186,7 @@ function close(set) {
 var scriptConfig = {
     "autoscript": "STAUTOSCRIPT.ZEBRALABEL.PRINTERS",
     "description": "Barcode Printers",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "active": true,
     "logLevel": "ERROR"
 };

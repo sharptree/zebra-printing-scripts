@@ -18,9 +18,14 @@ function main() {
 
     labels = _validateAndRemoveInvalidLabels(labels);
 
-
     if (typeof request !== 'undefined' && request) {
         responseBody = JSON.stringify(labels);
+    } else if (typeof labelName !== 'undefined' && labelName) {
+        labels.forEach(function (label) {
+            if (label.label == labelName) {
+                requestedLabel = JSON.stringify(label);
+            }
+        })
     }
 
     if (logger.isDebugEnabled()) {
@@ -72,7 +77,7 @@ function _convertMboToObject(mbo) {
     label.media = mbo.getString("MEDIA");
     label.usewith = mbo.getString("USEWITH");
     label.zpl = mbo.getString("ZPL");
-    label.default = mbo.getBoolean("DEFAULT");
+    label.default = mbo.getBoolean("ISDEFAULT");
 
     return label;
 }
@@ -154,7 +159,7 @@ function close(set) {
 var scriptConfig = {
     "autoscript": "STAUTOSCRIPT.ZEBRALABEL.LABELS",
     "description": "Barcode Label Definitions",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "active": true,
     "logLevel": "ERROR"
 };
